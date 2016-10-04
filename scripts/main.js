@@ -20,17 +20,13 @@ function init() {
 	loop(); // main programm loop
 };
 
-
 function initObjs() {
 
 	var earth = new spaceObj({texture: "imgs/texture_earth.jpg", size: 100});
-	OBJECTS.push(earth);
+	OBJECTS['earth'] = earth;
+	SCENE.add(OBJECTS['earth'].getMesh());
 
-	//TODO sun and planet position
-
-	for(var obj = 0; obj < OBJECTS.length; obj++) {
-		SCENE.add(OBJECTS[obj].getMesh());
-	}
+	// var sun
 };
 
 function loop() {

@@ -10,3 +10,7 @@ function spaceObj(props) {
 spaceObj.prototype.getMesh = function() {
     return this.mesh;
 };
+
+spaceObj.prototype.getTexture = function () {
+    return this.texture;
+}
