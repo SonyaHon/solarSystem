@@ -38,7 +38,7 @@ function initObjs() {
 	var earth = new spaceObj({texture: "imgs/texture_earth.jpg", size: 100});
 	OBJECTS.push(earth);
 
-	//TODO sun and planet position
+	//TODO sun and planet position and XUI
 
 	for(var obj = 0; obj < OBJECTS.length; obj++) {
 		SCENE.add(OBJECTS[obj].getMesh());
@@ -47,5 +47,6 @@ function initObjs() {
 
 function loop() {
 	requestAnimationFrame(loop);
+	OBJECTS[0].getMesh().rotate.y += 0.01;
 	RENDER.render(SCENE, CAMERA);
 };
