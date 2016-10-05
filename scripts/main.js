@@ -13,7 +13,7 @@ function init() {
 	CAMERA = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 10000);
 	
 	CAMERA.position.y = 0;
-	CAMERA.position.z = 100;
+	CAMERA.position.z = 70;
 
 	SCENE = new THREE.Scene();
 
@@ -31,13 +31,13 @@ function initObjs() {
 	OBJECTS['earth'] = earth;
 	SCENE.add(OBJECTS['earth'].getMesh());
 
-	var sun = new spaceObj({texture: "imgs/texture_sun.jpg", size: 109 * EARTH_SIZE / 2});
+	var sun = new spaceObj({texture: "imgs/texture_sun.jpg", size: 109 * EARTH_SIZE / 3});
 	OBJECTS['sun'] = sun;
 	SCENE.add(OBJECTS['sun'].getMesh());
 };
 
 function loop() {
 	requestAnimationFrame(loop);
-	//OBJECTS['earth'].animate();
+	OBJECTS['sun'].animate();
 	RENDER.render(SCENE, CAMERA);
 };

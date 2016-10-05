@@ -1,7 +1,7 @@
 function spaceObj(props) {
     this.texture = props['texture'];
     this.size = props['size'];
-    var geom = new THREE.SphereGeometry(this.size, 15, 15);
+    var geom = new THREE.SphereGeometry(this.size, 32, 32);
     var mat = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load(this.texture)});
     this.mesh = new THREE.Mesh(geom, mat);
 
@@ -19,8 +19,10 @@ spaceObj.prototype.getTexture = function () {
 }
 
 spaceObj.prototype.animate = function () {
+    /*
     this.mesh.position.x = this.mesh.position.x * Math.cos((180/Math.PI)*10) -
         this.mesh.position.y * Math.sin((180/Math.PI)*10);
     this.mesh.position.y = this.mesh.position.y * Math.cos((180/Math.PI)*10) +
         this.mesh.position.y * Math.sin((180/Math.PI)*10);
+        */
 }
