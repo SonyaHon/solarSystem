@@ -1,16 +1,19 @@
 var SCENE, CAMERA, RENDER; // for render and cam
 var OBJECTS = []; // all scene objects;
-var EARTH_SIZE = 50;
+var EARTH_SIZE = 1;
+var KILLOMETR = 0.0001;
+var ASTRO_ONE = 100;
+
 
 
 function init() {
 	var container = document.createElement('div');
 	document.body.appendChild(container);
 
-	CAMERA = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000);
+	CAMERA = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 10000);
 	
 	CAMERA.position.y = 0;
-	CAMERA.position.z = 600;
+	CAMERA.position.z = 100;
 
 	SCENE = new THREE.Scene();
 
@@ -24,16 +27,17 @@ function init() {
 
 function initObjs() {
 
-	var earth = new spaceObj({texture: "imgs/texture_earth.jpg", size: EARTH_SIZE});
+	var earth = new spaceObj({texture: "imgs/texture_earth.jpg", size: EARTH_SIZE, x: ASTRO_ONE});
 	OBJECTS['earth'] = earth;
 	SCENE.add(OBJECTS['earth'].getMesh());
 
-	var sun = new spaceObj({texture: "imgs/texture_sun.jpg", size: 109 * EARTH_SIZE});
+	var sun = new spaceObj({texture: "imgs/texture_sun.jpg", size: 109 * EARTH_SIZE / 2});
 	OBJECTS['sun'] = sun;
 	SCENE.add(OBJECTS['sun'].getMesh());
 };
 
 function loop() {
 	requestAnimationFrame(loop);
+	//OBJECTS['earth'].animate();
 	RENDER.render(SCENE, CAMERA);
 };
