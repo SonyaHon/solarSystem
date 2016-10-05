@@ -1,5 +1,7 @@
 var SCENE, CAMERA, RENDER; // for render and cam
 var OBJECTS = []; // all scene objects;
+var EARTH_SIZE = 50;
+
 
 function init() {
 	var container = document.createElement('div');
@@ -22,11 +24,13 @@ function init() {
 
 function initObjs() {
 
-	var earth = new spaceObj({texture: "imgs/texture_earth.jpg", size: 100});
+	var earth = new spaceObj({texture: "imgs/texture_earth.jpg", size: EARTH_SIZE});
 	OBJECTS['earth'] = earth;
 	SCENE.add(OBJECTS['earth'].getMesh());
 
-	// var sun
+	var sun = new spaceObj({texture: "imgs/texture_sun.jpg", size: 109 * EARTH_SIZE});
+	OBJECTS['sun'] = sun;
+	SCENE.add(OBJECTS['sun'].getMesh());
 };
 
 function loop() {
