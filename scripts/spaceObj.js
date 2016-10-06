@@ -2,8 +2,12 @@ function spaceObj(props) {
     // Mesh geometry and textures
     this.texture = props['texture'];
     this.size = props['size'];
+    this.isLightSource = props['isLightSource'] || false;
     var geom = new THREE.SphereGeometry(this.size, 32, 32);
-    var mat = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load(this.texture)});
+    if(this.isLightSource)
+        var mat = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load(this.texture)});
+    else
+        var mat = new THREE.MeshLambertMaterial({map: new THREE.TextureLoader().load(this.texture)});
     this.mesh = new THREE.Mesh(geom, mat);
 
     // Begining position
