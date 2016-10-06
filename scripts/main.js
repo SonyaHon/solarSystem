@@ -3,7 +3,10 @@ var OBJECTS = []; // all scene objects;
 var EARTH_SIZE = 1;
 var ASTRO_ONE = 100; // Коэфицент перехода к нормальной астрономической единице = 1498е+6
 var EARTH_YEAR = 0.0007;
-var CAMERA_SPEED = 5;
+
+var CAMERA_SPEED = 1;
+var CAMERA_HOR_AXIS = 0;
+var CAMERA_VERT_AXIS = 0;
 
 var backgroundStarsAmount = 3000;
 
@@ -27,22 +30,33 @@ function init() {
 	});
 
 	document.addEventListener('keydown', function(event){
-
 		console.log(event.key);
 		if(event.key == "w") {
-			CAMERA.translateZ(-CAMERA_SPEED);
+			//CAMERA.translateZ(-CAMERA_SPEED);
+			CAMERA_VERT_AXIS = -1;
 		}
 		else if (event.key == "s") {
-			CAMERA.translateZ(CAMERA_SPEED);
+			//CAMERA.translateZ(CAMERA_SPEED);
+			CAMERA_VERT_AXIS = 1;
 		}
 
 		if(event.key == "a") {
-			CAMERA.translateX(-CAMERA_SPEED);
+			//CAMERA.translateX(-CAMERA_SPEED);
+			CAMERA_HOR_AXIS = -1;
 		}
 		else if (event.key == "d") {
-			CAMERA.translateX(CAMERA_SPEED);
+			//CAMERA.translateX(CAMERA_SPEED);
+			CAMERA_HOR_AXIS = 1;
 		}
+	});
 
+	document.addEventListener('keyup', function (event) {
+		if(event.key == "w" || event.key == "s") {
+			CAMERA_VERT_AXIS = 0;
+		}
+		if(event.key == "a" || event.key == "d") {
+			CAMERA_HOR_AXIS = 0;
+		}
 	});
 
 	initObjs(); // init all objects and add them to scene
@@ -133,6 +147,7 @@ function initObjs() {
 function loop() {
 	requestAnimationFrame(loop);
 
+	// solar system stuff
 	OBJECTS['sun'].selfRotating();
 
 	OBJECTS['mercury'].selfRotating();
@@ -158,6 +173,11 @@ function loop() {
 
 	OBJECTS['neptune'].selfRotating();
 	OBJECTS['neptune'].orbitRotating();
+
+	//camera movement
+
+	CAMERA.translateZ(CAMERA_SPEED*CAMERA_VERT_AXIS);
+	CAMERA.translateX(CAMERA_SPEED*CAMERA_HOR_AXIS);
 
 	RENDER.render(SCENE, CAMERA);
 };
