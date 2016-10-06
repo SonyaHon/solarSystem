@@ -10,7 +10,7 @@ function spaceObj(props) {
         var mat = new THREE.MeshLambertMaterial({map: new THREE.TextureLoader().load(this.texture)});
     this.mesh = new THREE.Mesh(geom, mat);
 
-    // Begining position
+    // Beginning position
     this.mesh.position.x = props['x'] || 0;
     this.mesh.position.y = props['y'] || 0;
     this.mesh.position.z = props['z'] || 0;
@@ -30,17 +30,14 @@ spaceObj.prototype.getMesh = function() {
     return this.mesh;
 };
 
-spaceObj.prototype.getTexture = function () {
-    return this.texture;
-}
 
 spaceObj.prototype.selfRotating = function () {
     this.mesh.rotation.y += this.speedOfSelfRotating;
     this.mesh.rotation.z += this.speedOfSelfRotating;
-}
+};
 
 spaceObj.prototype.orbitRotating = function () {
     this.mesh.position.z = -Math.sin(this.orbitAngle*0.1)*this.distanceFromSun; // TODO maybe change to real orbits x and y
     this.mesh.position.x = Math.cos(this.orbitAngle*0.1)*this.distanceFromSun;
     this.orbitAngle += 180/Math.PI*this.orbitRotationSpeed;
-}
+};
