@@ -2,3 +2,17 @@ body {
 	margin: 0;
 	padding: 0;
 }
+
+#buttons {
+	margin: 0;
+	position: absolute;
+}
+
+button {
+	background-color: black;
+	border: white solid 1px;
+	margin: 5px;
+	padding: 2px 5px;
+	color: white;
+	min-width: 100px;
+}

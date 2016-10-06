@@ -4,9 +4,19 @@ var EARTH_SIZE = 1;
 var ASTRO_ONE = 100; // Коэфицент перехода к нормальной астрономической единице = 1498е+6
 var EARTH_YEAR = 0.0007;
 
-var CAMERA_SPEED = 1;
+// WASD camera movement
+var CAMERA_SPEED = 0.5;
 var CAMERA_HOR_AXIS = 0;
 var CAMERA_VERT_AXIS = 0;
+
+// Camera rotation
+var CAMERA_ROT_SPEED = 0.009;
+var MOUSEX_OFFSET = 0;
+var MOUSEY_OFFSET = 0;
+var cameraXAngle;
+var cameraYAngle;
+var cameraZAngle = 0;
+var canCamRotate = false;
 
 var backgroundStarsAmount = 3000;
 
@@ -26,7 +36,8 @@ function init() {
 	container.appendChild(RENDER.domElement);
 
 	document.addEventListener('mousemove', function (event) {
-		// TODO camera rotation probably with rotateX
+		MOUSEX_OFFSET = event.clientX - window.innerWidth / 2;
+		MOUSEY_OFFSET = event.clientY - window.innerHeight / 2;
 	});
 
 	document.addEventListener('keydown', function(event){
@@ -48,6 +59,16 @@ function init() {
 			//CAMERA.translateX(CAMERA_SPEED);
 			CAMERA_HOR_AXIS = 1;
 		}
+
+		if(event.key == "Control") {
+			canCamRotate = true;
+		}
+		if(event.key == "q") {
+			cameraZAngle = -1;
+		}
+		else if (event.key == "e") {
+			cameraZAngle = 1;
+		}
 	});
 
 	document.addEventListener('keyup', function (event) {
@@ -56,6 +77,17 @@ function init() {
 		}
 		if(event.key == "a" || event.key == "d") {
 			CAMERA_HOR_AXIS = 0;
+		}
+		if(event.key == "Control") {
+			canCamRotate = false;
+		}
+
+		if(event.key == "q") {
+			cameraZAngle = 0;
+		}
+
+		if(event.key == "e") {
+			cameraZAngle = 0;
 		}
 	});
 
@@ -175,9 +207,35 @@ function loop() {
 	OBJECTS['neptune'].orbitRotating();
 
 	//camera movement
-
 	CAMERA.translateZ(CAMERA_SPEED*CAMERA_VERT_AXIS);
 	CAMERA.translateX(CAMERA_SPEED*CAMERA_HOR_AXIS);
 
+	// camera rotation
+	if(!canCamRotate) {
+		if (Math.abs(MOUSEX_OFFSET) > 50) {
+			var multy1 = (Math.abs(MOUSEX_OFFSET*100)/(window.innerWidth/2))/90;
+			cameraXAngle = CAMERA_ROT_SPEED * Math.sign(MOUSEX_OFFSET)*multy1;
+		}
+		else if (Math.abs(MOUSEX_OFFSET) <= 50) {
+			cameraXAngle = 0;
+		}
+
+		if (Math.abs(MOUSEY_OFFSET) > 50) {
+			var multy2 = (Math.abs(MOUSEY_OFFSET*100)/(window.innerHeight/2))/90;
+			cameraYAngle = CAMERA_ROT_SPEED * Math.sign(MOUSEY_OFFSET) *multy2;
+		}
+		else if (Math.abs(MOUSEY_OFFSET) <= 50) {
+			cameraYAngle = 0;
+		}
+
+		CAMERA.rotateY(-cameraXAngle);
+		CAMERA.rotateX(-cameraYAngle);
+		CAMERA.rotateZ(-cameraZAngle*0.007);
+	}
+
 	RENDER.render(SCENE, CAMERA);
+};
+
+function help() { // Function starts when help button is pressed
+	//TODO HELP FUNCTION
 };
