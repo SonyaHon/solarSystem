@@ -237,5 +237,8 @@ function loop() {
 };
 
 function help() { // Function starts when help button is pressed
-	//TODO HELP FUNCTION
+	$("#info").html("Controls:<br> Use wasd for movement.<br> Use mouse and qe for rotation. <br> Hold " +
+		"ctrl to move mouse without camera rotation. <br><br>" +
+		"Press HELP again to close this window.");
+	$("#info").toggle();
 };
