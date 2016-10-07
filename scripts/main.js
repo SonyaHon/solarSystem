@@ -2,7 +2,7 @@ var SCENE, CAMERA, RENDER; // for render and cam
 var OBJECTS = []; // all scene objects;
 var EARTH_SIZE = 1;
 var ASTRO_ONE = 100; // Коэфицент перехода к нормальной астрономической единице = 1498е+6
-var EARTH_YEAR = 0.0007;
+var EARTH_YEAR = 0.00001;
 
 // WASD camera movement
 var CAMERA_SPEED = 0.5;
@@ -19,6 +19,20 @@ var cameraZAngle = 0;
 var canCamRotate = false;
 
 var backgroundStarsAmount = 3000;
+
+var settings = {
+	time_speed: 1,
+    help: function () {
+        $("#info").html("Controls:<br> Use wasd for movement.<br> Use mouse and qe for rotation. <br> Hold " +
+            "ctrl to move mouse without camera rotation. <br><br>" +
+            "Press HELP again to close this window.");
+        $("#info").toggle();
+    },
+    camera_speed: 0.5
+};
+
+
+
 
 function init() {
 	var container = document.createElement('div');
@@ -93,6 +107,12 @@ function init() {
 
 	initObjs(); // init all objects and add them to scene
 	loop(); // main programm loop
+
+    var gui = new dat.GUI();
+    gui.add(settings, 'help');
+    gui.add(settings, 'time_speed', 1, 10000);
+    gui.add(settings, 'camera_speed', 0.00, 10);
+
 };
 
 function initObjs() {
@@ -135,42 +155,43 @@ function initObjs() {
 
 
 	var mercury = new spaceObj({texture: "imgs/texture_mercury.jpg", size: EARTH_SIZE / 3, x: 0.5*ASTRO_ONE,
-	orbitRotationSpeed: EARTH_YEAR * 4});
+	orbitRotationSpeed: EARTH_YEAR * 4, orbitCoef: 4});
 	OBJECTS['mercury'] = mercury;
 	SCENE.add(OBJECTS['mercury'].getMesh());
 
 	var venus = new spaceObj({texture: "imgs/texture_venus.jpg", size: EARTH_SIZE * 0.95, x: ASTRO_ONE*0.75,
-	orbitRotationSpeed: EARTH_YEAR * 1.05});
+	orbitRotationSpeed: EARTH_YEAR * 1.05, orbitCoef: 1.05});
 	OBJECTS['venus'] = venus;
 	SCENE.add(OBJECTS['venus'].getMesh());
 
-	var earth = new spaceObj({texture: "imgs/texture_earth.jpg", size: EARTH_SIZE, x: ASTRO_ONE});
+	var earth = new spaceObj({texture: "imgs/texture_earth.jpg", size: EARTH_SIZE, x: ASTRO_ONE,
+    orbitRotationSpeed: EARTH_YEAR, orbitCoef: 1});
 	OBJECTS['earth'] = earth;
 	SCENE.add(OBJECTS['earth'].getMesh());
 
 	var mars = new spaceObj({texture: "imgs/texture_mars.jpg", size: EARTH_SIZE * 0.5, x: ASTRO_ONE*1.4,
-		orbitRotationSpeed: EARTH_YEAR * 0.55});
+		orbitRotationSpeed: EARTH_YEAR * 0.55, orbitCoef: 0.55});
 	OBJECTS['mars'] = mars;
 	SCENE.add(OBJECTS['mars'].getMesh());
 
 	var jupiter = new spaceObj({texture: "imgs/texture_jupiter.jpg", size: EARTH_SIZE * 12.5, x: ASTRO_ONE*2,
-		orbitRotationSpeed: EARTH_YEAR * 0.08});
+		orbitRotationSpeed: EARTH_YEAR * 0.08, orbitCoef: 0.08});
 	jupiter.getMesh().CastShadow = true;
 	OBJECTS['jupiter'] = jupiter;
 	SCENE.add(OBJECTS['jupiter'].getMesh());
 
 	var saturn = new spaceObj({texture: "imgs/texture_saturn.jpg", size: EARTH_SIZE * 10, x: ASTRO_ONE*3,
-		orbitRotationSpeed: EARTH_YEAR * 0.03});
+		orbitRotationSpeed: EARTH_YEAR * 0.03, orbitCoef: 0.03});
 	OBJECTS['saturn'] = saturn;
 	SCENE.add(OBJECTS['saturn'].getMesh());
 
 	var urane = new  spaceObj({texture: "imgs/texture_urane.jpg", size: EARTH_SIZE * 4, x: ASTRO_ONE*4,
-		orbitRotationSpeed: EARTH_YEAR * 0.001});
+		orbitRotationSpeed: EARTH_YEAR * 0.001, orbitCoef: 0.001});
 	OBJECTS['urane'] = urane;
 	SCENE.add(OBJECTS['urane'].getMesh());
 
 	var neptune = new  spaceObj({texture: "imgs/texture_neptune.jpg", size: EARTH_SIZE * 4, x: ASTRO_ONE*4.5,
-		orbitRotationSpeed: EARTH_YEAR * 0.0007});
+		orbitRotationSpeed: EARTH_YEAR * 0.0007, orbitCoef: 0.0007});
 	OBJECTS['neptune'] = neptune;
 	SCENE.add(OBJECTS['neptune'].getMesh());
 
@@ -178,6 +199,13 @@ function initObjs() {
 
 function loop() {
 	requestAnimationFrame(loop);
+
+    //update some globals
+    for(var key in OBJECTS) {
+        OBJECTS[key].orbitRotationSpeed = EARTH_YEAR * OBJECTS[key].orbitCoef * settings.time_speed;
+    }
+    CAMERA_SPEED = settings.camera_speed;
+
 
 	// solar system stuff
 	OBJECTS['sun'].selfRotating();
@@ -236,9 +264,3 @@ function loop() {
 	RENDER.render(SCENE, CAMERA);
 };
 
-function help() { // Function starts when help button is pressed
-	$("#info").html("Controls:<br> Use wasd for movement.<br> Use mouse and qe for rotation. <br> Hold " +
-		"ctrl to move mouse without camera rotation. <br><br>" +
-		"Press HELP again to close this window.");
-	$("#info").toggle();
-};

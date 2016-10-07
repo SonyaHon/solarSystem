@@ -22,7 +22,8 @@ function spaceObj(props) {
         + this.mesh.position.y*this.mesh.position.y
         + this.mesh.position.z + this.mesh.position.z);
     this.distanceFromSun = props['distanceFromSun'] || dist;
-    this.orbitRotationSpeed = props['orbitRotationSpeed'] || 0.0007; // CHANGE CAREFULLY!!!
+    this.orbitRotationSpeed = props['orbitRotationSpeed'] || 0.00001; // CHANGE CAREFULLY!!!
+    this.orbitCoef = props['orbitCoef'] || 1;
     
 };
 
@@ -37,7 +38,7 @@ spaceObj.prototype.selfRotating = function () {
 };
 
 spaceObj.prototype.orbitRotating = function () {
-    this.mesh.position.z = -Math.sin(this.orbitAngle*0.1)*this.distanceFromSun; // TODO maybe change to real orbits x and y
+    this.mesh.position.z = -Math.sin(this.orbitAngle*0.1)*this.distanceFromSun;
     this.mesh.position.x = Math.cos(this.orbitAngle*0.1)*this.distanceFromSun;
     this.orbitAngle += 180/Math.PI*this.orbitRotationSpeed;
 };

@@ -3,18 +3,12 @@ body {
 	padding: 0;
 }
 
-#buttons {
-	margin: 0;
-	position: absolute;
-}
-
 #info {
 	margin: 5px;
 	padding: 5px;
 	border: white solid 2px;
 	color: white;
 	position: absolute;
-	right: 0px;
 	max-width: 30%;
 	display: none;
 }
