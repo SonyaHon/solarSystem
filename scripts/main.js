@@ -20,6 +20,12 @@ var canCamRotate = false;
 
 var backgroundStarsAmount = 3000;
 
+// planet infos
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+var INTERSECTED;
+var mousePressed = false;
+
 var settings = {
 	time_speed: 1,
     help: function () {
@@ -52,6 +58,10 @@ function init() {
 	document.addEventListener('mousemove', function (event) {
 		MOUSEX_OFFSET = event.clientX - window.innerWidth / 2;
 		MOUSEY_OFFSET = event.clientY - window.innerHeight / 2;
+
+		mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+		mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
 	});
 
 	document.addEventListener('keydown', function(event){
@@ -105,6 +115,14 @@ function init() {
 		}
 	});
 
+    document.addEventListener('mousedown', function () {
+        mousePressed = true;
+    });
+
+    document.addEventListener('mouseup', function () {
+        mousePressed = false;
+    });
+
 	initObjs(); // init all objects and add them to scene
 	loop(); // main programm loop
 
@@ -155,7 +173,7 @@ function initObjs() {
 
 
 	var mercury = new spaceObj({texture: "imgs/texture_mercury.jpg", size: EARTH_SIZE / 3, x: 0.5*ASTRO_ONE,
-	orbitRotationSpeed: EARTH_YEAR * 4, orbitCoef: 4});
+	orbitRotationSpeed: EARTH_YEAR * 4, orbitCoef: 4, info: "Its a mercury, closest planet to sun."});
 	OBJECTS['mercury'] = mercury;
 	SCENE.add(OBJECTS['mercury'].getMesh());
 
@@ -260,6 +278,45 @@ function loop() {
 		CAMERA.rotateX(-cameraYAngle);
 		CAMERA.rotateZ(-cameraZAngle*0.007);
 	}
+
+	raycaster.setFromCamera( mouse, CAMERA );
+	var intersects = raycaster.intersectObjects( SCENE.children );
+	if(intersects.length > 0) {
+	    if(INTERSECTED != intersects[0].object) {
+                INTERSECTED = intersects[0].object;
+            if(INTERSECTED.material.emissive != null) {
+                INTERSECTED.material.emissive.set(0x660000);
+            }
+            else {
+                INTERSECTED.material.color.set(0x660000);
+            }
+        }
+    }
+    else {
+        if(INTERSECTED != null) {
+            if(INTERSECTED.material.emissive != null) {
+                INTERSECTED.material.emissive.set(0x000000);
+            }
+            else {
+                INTERSECTED.material.color.set(0xffffff);
+            }
+            INTERSECTED = null;
+        }
+    }
+
+    if(INTERSECTED != null && mousePressed) {
+        for(var key in OBJECTS) {
+            if(OBJECTS[key].mesh === INTERSECTED) {
+                $("#info").html(OBJECTS[key].info);
+                $("#info").show();
+            }
+        }
+        mousePressed = false;
+    }
+    else if(INTERSECTED == null && mousePressed) {
+        $("#info").html("");
+        $("#info").hide();
+    }
 
 	RENDER.render(SCENE, CAMERA);
 };

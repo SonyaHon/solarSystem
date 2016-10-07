@@ -2,6 +2,7 @@ function spaceObj(props) {
     // Mesh geometry and textures
     this.texture = props['texture'];
     this.size = props['size'];
+    this.info = props['info'] || "          ";
     this.isLightSource = props['isLightSource'] || false;
     var geom = new THREE.SphereGeometry(this.size, 32, 32);
     if(this.isLightSource)
