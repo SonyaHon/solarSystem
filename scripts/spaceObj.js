@@ -1,5 +1,6 @@
 function spaceObj(props) {
     // Mesh geometry and textures
+    this.name = props['name'];
     this.texture = props['texture'];
     this.size = props['size'];
     this.info = props['info'] || "          ";
@@ -27,11 +28,6 @@ function spaceObj(props) {
     this.orbitCoef = props['orbitCoef'] || 1;
     
 };
-
-spaceObj.prototype.getMesh = function() {
-    return this.mesh;
-};
-
 
 spaceObj.prototype.selfRotating = function () {
     this.mesh.rotation.y += this.speedOfSelfRotating;

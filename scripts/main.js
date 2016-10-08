@@ -1,8 +1,9 @@
-var SCENE, CAMERA, RENDER; // for render and cam
-var OBJECTS = []; // all scene objects;
+var RENDER;
 var EARTH_SIZE = 1;
 var ASTRO_ONE = 100; // Коэфицент перехода к нормальной астрономической единице = 1498е+6
 var EARTH_YEAR = 0.00001;
+
+var currentScene = null;
 
 // WASD camera movement
 var CAMERA_SPEED = 0.5;
@@ -44,12 +45,32 @@ function init() {
 	var container = document.createElement('div');
 	document.body.appendChild(container);
 
-	CAMERA = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 10000);
-	
-	CAMERA.position.y = 0;
-	CAMERA.position.z = 400;
+	var mainScene = new createScene([
+			new spaceObj({texture: "imgs/texture_sun.jpg", size: 109 * EARTH_SIZE / 3, isLightSource: true,
+				info: infos.sun, name: "sun"}),
+			new spaceObj({texture: "imgs/texture_mercury.jpg", size: EARTH_SIZE / 3, x: 0.5*ASTRO_ONE,
+				orbitRotationSpeed: EARTH_YEAR * 4, orbitCoef: 4, info: infos.mercury, name: "mercury"}),
+			new spaceObj({texture: "imgs/texture_venus.jpg", size: EARTH_SIZE * 0.95, x: ASTRO_ONE*0.75,
+				orbitRotationSpeed: EARTH_YEAR * 1.05, orbitCoef: 1.05, info: infos.venus, name: "venus"}),
+			new spaceObj({texture: "imgs/texture_earth.jpg", size: EARTH_SIZE, x: ASTRO_ONE,
+				orbitRotationSpeed: EARTH_YEAR, orbitCoef: 1, info: infos.earth, name: "earth"}),
+			new spaceObj({texture: "imgs/texture_mars.jpg", size: EARTH_SIZE * 0.5, x: ASTRO_ONE*1.4,
+				orbitRotationSpeed: EARTH_YEAR * 0.55, orbitCoef: 0.55, info: infos.mars, name: "mars"}),
+			new spaceObj({texture: "imgs/texture_jupiter.jpg", size: EARTH_SIZE * 12.5, x: ASTRO_ONE*2,
+				orbitRotationSpeed: EARTH_YEAR * 0.08, orbitCoef: 0.08, info: infos.jupiter, name: "jupiter"}),
+			new spaceObj({texture: "imgs/texture_saturn.jpg", size: EARTH_SIZE * 10, x: ASTRO_ONE*3,
+				orbitRotationSpeed: EARTH_YEAR * 0.03, orbitCoef: 0.03, info: infos.saturn, name: "saturn"}),
+			new spaceObj({texture: "imgs/texture_urane.jpg", size: EARTH_SIZE * 4, x: ASTRO_ONE*4,
+				orbitRotationSpeed: EARTH_YEAR * 0.001, orbitCoef: 0.001, info: infos.uranus, name: "uranus"}),
+			new spaceObj({texture: "imgs/texture_neptune.jpg", size: EARTH_SIZE * 4, x: ASTRO_ONE*4.5,
+				orbitRotationSpeed: EARTH_YEAR * 0.0007, orbitCoef: 0.0007, info: infos.neptune, name: "neptune"})
+		],
+		"sun",
+		200,
+		true
+	);
 
-	SCENE = new THREE.Scene();
+	currentScene = mainScene;
 
 	RENDER = new THREE.WebGLRenderer();
 	RENDER.setSize(window.innerWidth, window.innerHeight);
@@ -123,7 +144,7 @@ function init() {
         mousePressed = false;
     });
 
-	initObjs(); // init all objects and add them to scene
+
 	loop(); // main programm loop
 
     var gui = new dat.GUI();
@@ -133,128 +154,21 @@ function init() {
 
 };
 
-function initObjs() {
-
-	// Stars in the  background
-	var starsSystem;
-	var stGeom = new THREE.Geometry();
-	var stMat = new THREE.ParticleBasicMaterial({size: 1, sizeAttenuation: false});
-	for(var i = 0; i < backgroundStarsAmount; i++) {
-		var vert = new THREE.Vector3();
-		vert.x = Math.random()*2-1;
-		vert.y = Math.random()*2-1;
-		vert.z = Math.random()*2-1;
-
-		vert.multiplyScalar(5000);
-
-		stGeom.vertices.push(vert);
-	}
-
-	starsSystem = new THREE.ParticleSystem(stGeom, stMat);
-	OBJECTS['starSystem'] = starsSystem;
-	SCENE.add(starsSystem);
-
-	var sun = new spaceObj({texture: "imgs/texture_sun.jpg", size: 109 * EARTH_SIZE / 3, isLightSource: true});
-	OBJECTS['sun'] = sun;
-	SCENE.add(OBJECTS['sun'].getMesh());
-
-	//adding light from the sun
-	var light = new THREE.PointLight(0xf2f2dc, 2, ASTRO_ONE * 5);
-	light.position.set(0, 0, 0);
-	light.castShadow = true;
-	light.ShadowMapWidth = 2048;
-	light.ShadowMapHeight = 2048;
-	OBJECTS['light'] = light;
-	SCENE.add(light);
-
-	// adding ambient occlusion
-	var ambLight = new THREE.AmbientLight(0xf2f2dc, 0.2);
-	SCENE.add(ambLight);
-
-
-	var mercury = new spaceObj({texture: "imgs/texture_mercury.jpg", size: EARTH_SIZE / 3, x: 0.5*ASTRO_ONE,
-	orbitRotationSpeed: EARTH_YEAR * 4, orbitCoef: 4, info: "Its a mercury, closest planet to sun."});
-	OBJECTS['mercury'] = mercury;
-	SCENE.add(OBJECTS['mercury'].getMesh());
-
-	var venus = new spaceObj({texture: "imgs/texture_venus.jpg", size: EARTH_SIZE * 0.95, x: ASTRO_ONE*0.75,
-	orbitRotationSpeed: EARTH_YEAR * 1.05, orbitCoef: 1.05});
-	OBJECTS['venus'] = venus;
-	SCENE.add(OBJECTS['venus'].getMesh());
-
-	var earth = new spaceObj({texture: "imgs/texture_earth.jpg", size: EARTH_SIZE, x: ASTRO_ONE,
-    orbitRotationSpeed: EARTH_YEAR, orbitCoef: 1});
-	OBJECTS['earth'] = earth;
-	SCENE.add(OBJECTS['earth'].getMesh());
-
-	var mars = new spaceObj({texture: "imgs/texture_mars.jpg", size: EARTH_SIZE * 0.5, x: ASTRO_ONE*1.4,
-		orbitRotationSpeed: EARTH_YEAR * 0.55, orbitCoef: 0.55});
-	OBJECTS['mars'] = mars;
-	SCENE.add(OBJECTS['mars'].getMesh());
-
-	var jupiter = new spaceObj({texture: "imgs/texture_jupiter.jpg", size: EARTH_SIZE * 12.5, x: ASTRO_ONE*2,
-		orbitRotationSpeed: EARTH_YEAR * 0.08, orbitCoef: 0.08});
-	jupiter.getMesh().CastShadow = true;
-	OBJECTS['jupiter'] = jupiter;
-	SCENE.add(OBJECTS['jupiter'].getMesh());
-
-	var saturn = new spaceObj({texture: "imgs/texture_saturn.jpg", size: EARTH_SIZE * 10, x: ASTRO_ONE*3,
-		orbitRotationSpeed: EARTH_YEAR * 0.03, orbitCoef: 0.03});
-	OBJECTS['saturn'] = saturn;
-	SCENE.add(OBJECTS['saturn'].getMesh());
-
-	var urane = new  spaceObj({texture: "imgs/texture_urane.jpg", size: EARTH_SIZE * 4, x: ASTRO_ONE*4,
-		orbitRotationSpeed: EARTH_YEAR * 0.001, orbitCoef: 0.001});
-	OBJECTS['urane'] = urane;
-	SCENE.add(OBJECTS['urane'].getMesh());
-
-	var neptune = new  spaceObj({texture: "imgs/texture_neptune.jpg", size: EARTH_SIZE * 4, x: ASTRO_ONE*4.5,
-		orbitRotationSpeed: EARTH_YEAR * 0.0007, orbitCoef: 0.0007});
-	OBJECTS['neptune'] = neptune;
-	SCENE.add(OBJECTS['neptune'].getMesh());
-
-};
-
 function loop() {
 	requestAnimationFrame(loop);
 
     //update some globals
-    for(var key in OBJECTS) {
-        OBJECTS[key].orbitRotationSpeed = EARTH_YEAR * OBJECTS[key].orbitCoef * settings.time_speed;
+    for(var key in currentScene.sceneObjects) {
+        currentScene.sceneObjects[key].orbitRotationSpeed = EARTH_YEAR * currentScene.sceneObjects[key].orbitCoef * settings.time_speed;
     }
     CAMERA_SPEED = settings.camera_speed;
 
-
-	// solar system stuff
-	OBJECTS['sun'].selfRotating();
-
-	OBJECTS['mercury'].selfRotating();
-	OBJECTS['mercury'].orbitRotating();
-
-	OBJECTS['venus'].selfRotating();
-	OBJECTS['venus'].orbitRotating();
-
-	OBJECTS['earth'].selfRotating();
-	OBJECTS['earth'].orbitRotating();
-
-	OBJECTS['mars'].selfRotating();
-	OBJECTS['mars'].orbitRotating();
-
-	OBJECTS['jupiter'].selfRotating();
-	OBJECTS['jupiter'].orbitRotating();
-
-	OBJECTS['saturn'].selfRotating();
-	OBJECTS['saturn'].orbitRotating();
-
-	OBJECTS['urane'].selfRotating();
-	OBJECTS['urane'].orbitRotating();
-
-	OBJECTS['neptune'].selfRotating();
-	OBJECTS['neptune'].orbitRotating();
+	//Scene update
+	currentScene.loopFunction();
 
 	//camera movement
-	CAMERA.translateZ(CAMERA_SPEED*CAMERA_VERT_AXIS);
-	CAMERA.translateX(CAMERA_SPEED*CAMERA_HOR_AXIS);
+	currentScene.camera.translateZ(CAMERA_SPEED*CAMERA_VERT_AXIS);
+	currentScene.camera.translateX(CAMERA_SPEED*CAMERA_HOR_AXIS);
 
 	// camera rotation
 	if(!canCamRotate) {
@@ -274,13 +188,13 @@ function loop() {
 			cameraYAngle = 0;
 		}
 
-		CAMERA.rotateY(-cameraXAngle);
-		CAMERA.rotateX(-cameraYAngle);
-		CAMERA.rotateZ(-cameraZAngle*0.007);
+		currentScene.camera.rotateY(-cameraXAngle);
+		currentScene.camera.rotateX(-cameraYAngle);
+		currentScene.camera.rotateZ(-cameraZAngle*0.007);
 	}
 
-	raycaster.setFromCamera( mouse, CAMERA );
-	var intersects = raycaster.intersectObjects( SCENE.children );
+	raycaster.setFromCamera( mouse, currentScene.camera );
+	var intersects = raycaster.intersectObjects( currentScene.scene.children );
 	if(intersects.length > 0) {
 	    if(INTERSECTED != intersects[0].object) {
                 INTERSECTED = intersects[0].object;
@@ -305,9 +219,10 @@ function loop() {
     }
 
     if(INTERSECTED != null && mousePressed) {
-        for(var key in OBJECTS) {
-            if(OBJECTS[key].mesh === INTERSECTED) {
-                $("#info").html(OBJECTS[key].info);
+        for(var key in currentScene.sceneObjects) {
+            if(currentScene.sceneObjects[key].mesh === INTERSECTED) {
+                $("#info").html("Name: " +currentScene.sceneObjects[key].name + "<br>" +
+					currentScene.sceneObjects[key].info);
                 $("#info").show();
             }
         }
@@ -318,6 +233,8 @@ function loop() {
         $("#info").hide();
     }
 
-	RENDER.render(SCENE, CAMERA);
+
+
+	RENDER.render(currentScene.scene, currentScene.camera);
 };
 
