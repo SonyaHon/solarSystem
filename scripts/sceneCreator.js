@@ -2,7 +2,10 @@ function createScene(props, centerName, cameraStartZPos, hasPointLight) {
     this.scene = new THREE.Scene();
     this.sceneObjects = [];
     this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000);
-    this.camera.position.z = cameraStartZPos || 200;
+    this.cameraZ = cameraStartZPos || 200;
+    this.camera.position.x = 0;
+    this.camera.position.y = 0;
+    this.camera.position.z = this.cameraZ;
 
     //Lighting
     if (hasPointLight) {

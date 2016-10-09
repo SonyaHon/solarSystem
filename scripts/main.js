@@ -4,6 +4,7 @@ var ASTRO_ONE = 100; // Коэфицент перехода к нормальн�
 var EARTH_YEAR = 0.00001;
 
 var currentScene = null;
+var scenes = [];
 
 // WASD camera movement
 var CAMERA_SPEED = 0.5;
@@ -27,6 +28,8 @@ var mouse = new THREE.Vector2();
 var INTERSECTED;
 var mousePressed = false;
 
+
+// GUI
 var settings = {
 	time_speed: 1,
     help: function () {
@@ -35,7 +38,14 @@ var settings = {
             "Press HELP again to close this window.");
         $("#info").toggle();
     },
-    camera_speed: 0.5
+    camera_speed: 0.5,
+	GoToSun: function () {
+		currentScene = scenes['sun'];
+		currentScene.camera.position.x = 0;
+		currentScene.camera.position.y = 0;
+		currentScene.camera.position.z = currentScene.cameraZ;
+		$("#info").hide();
+	}
 };
 
 
@@ -44,6 +54,19 @@ var settings = {
 function init() {
 	var container = document.createElement('div');
 	document.body.appendChild(container);
+
+	var earthScene = new createScene([
+		new spaceObj({texture: "imgs/texture_earth.jpg", size: EARTH_SIZE,
+			orbitRotationSpeed: EARTH_YEAR, orbitCoef: 1, info: infos.earth, name: "earth"}),
+		new spaceObj({texture: "imgs/texture_moon.jpg", size: 0.2 * EARTH_SIZE, info: infos.moon,
+			orbitRotationSpeed: EARTH_YEAR, orbitCoef: 1, name: "moon", x: EARTH_SIZE * 2})
+		],
+		"earth",
+		6,
+		false
+	);
+
+	scenes['earth'] = earthScene;
 
 	var mainScene = new createScene([
 			new spaceObj({texture: "imgs/texture_sun.jpg", size: 109 * EARTH_SIZE / 3, isLightSource: true,
@@ -69,6 +92,7 @@ function init() {
 		200,
 		true
 	);
+	scenes['sun'] = mainScene;
 
 	currentScene = mainScene;
 
@@ -136,22 +160,22 @@ function init() {
 		}
 	});
 
-    document.addEventListener('mousedown', function () {
+	container.addEventListener('mousedown', function () {
         mousePressed = true;
     });
 
-    document.addEventListener('mouseup', function () {
+	container.addEventListener('mouseup', function () {
         mousePressed = false;
     });
 
 
 	loop(); // main programm loop
 
-    var gui = new dat.GUI();
+	var gui = new dat.GUI();
     gui.add(settings, 'help');
     gui.add(settings, 'time_speed', 1, 10000);
     gui.add(settings, 'camera_speed', 0.00, 10);
-
+	gui.add(settings, 'GoToSun');
 };
 
 function loop() {
@@ -197,6 +221,14 @@ function loop() {
 	var intersects = raycaster.intersectObjects( currentScene.scene.children );
 	if(intersects.length > 0) {
 	    if(INTERSECTED != intersects[0].object) {
+	    	if(INTERSECTED != null) {
+	    		if(INTERSECTED.material.emissive != null) {
+	    			INTERSECTED.material.emissive.set(0x000000);
+				}
+				else {
+					INTERSECTED.material.color.set(0xffffff);
+				}
+			}
                 INTERSECTED = intersects[0].object;
             if(INTERSECTED.material.emissive != null) {
                 INTERSECTED.material.emissive.set(0x660000);
@@ -221,8 +253,17 @@ function loop() {
     if(INTERSECTED != null && mousePressed) {
         for(var key in currentScene.sceneObjects) {
             if(currentScene.sceneObjects[key].mesh === INTERSECTED) {
-                $("#info").html("Name: " +currentScene.sceneObjects[key].name + "<br>" +
-					currentScene.sceneObjects[key].info);
+				$("#info").html("Name: " +currentScene.sceneObjects[key].name + "<br>" +
+					currentScene.sceneObjects[key].info + "<br>");
+				var index = currentScene.sceneObjects[key];
+				if(currentScene == scenes['sun']) {
+					var button = document.createElement('button');
+					button.onclick = function () {
+						asd(index);
+					}
+					document.getElementById("info").appendChild(button);
+					$("#info button").html("Go to");
+				}
                 $("#info").show();
             }
         }
@@ -234,7 +275,13 @@ function loop() {
     }
 
 
-
 	RENDER.render(currentScene.scene, currentScene.camera);
 };
 
+function asd(obj) {
+	currentScene = scenes[obj.name];
+	currentScene.camera.position.x = 0;
+	currentScene.camera.position.y = 0;
+	currentScene.camera.position.z = currentScene.cameraZ;
+	$("#info").hide();
+}
