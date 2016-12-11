@@ -20,8 +20,7 @@ function createScene(props, centerName, cameraStartZPos, hasPointLight) {
 
         var ambLight = new THREE.AmbientLight(0xf2f2dc, 0.2);
         this.scene.add(ambLight);
-    }
-    else {
+    } else {
         var ambLight = new THREE.AmbientLight(0xf2f2dc, 0.5);
         this.scene.add(ambLight);
     }
@@ -29,7 +28,10 @@ function createScene(props, centerName, cameraStartZPos, hasPointLight) {
     //Adding stars
     var starsSystem;
     var stGeom = new THREE.Geometry();
-    var stMat = new THREE.ParticleBasicMaterial({size: 1, sizeAttenuation: false});
+    var stMat = new THREE.ParticleBasicMaterial({
+        size: 1,
+        sizeAttenuation: false
+    });
     for (var i = 0; i < backgroundStarsAmount; i++) {
         var vert = new THREE.Vector3();
         vert.x = Math.random() * 2 - 1;
@@ -50,12 +52,12 @@ function createScene(props, centerName, cameraStartZPos, hasPointLight) {
         this.scene.add(props[key].mesh);
     }
 
-    this.loopFunction = function () {
-        for(var i = 2; i < this.sceneObjects.length; i++) {
+    this.loopFunction = function() {
+        for (var i = 2; i < this.sceneObjects.length; i++) {
             this.sceneObjects[i].selfRotating();
-            if(this.sceneObjects[i].name !== centerName) {
+            if (this.sceneObjects[i].name !== centerName) {
                 this.sceneObjects[i].orbitRotating();
             }
         }
     }
-}
+};
